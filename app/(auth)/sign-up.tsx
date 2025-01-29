@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import CustomButton from '@/components/ui/CustomButton';
 import { Link } from 'expo-router';
+import { createUser } from "@/lib/appwrite"
 
 export default function SignUp() {
     const [ user, setUser ] = useState({
@@ -16,7 +17,9 @@ export default function SignUp() {
     const [ passwordVisible, setPasswordVisible ] = useState<boolean>(false)
     const [ loading, setLoading ] = useState<boolean>(false)
 
-    const handleSubmit = () => {}
+    const handleSubmit = () => {
+        createUser();
+    }
 
     return (
         <SafeAreaView className='min-h-full bg-primary'>
