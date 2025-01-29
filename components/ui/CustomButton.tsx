@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text, GestureResponderEvent } from "react-native";
+import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 
 type CustomButtonProps = Partial<{
     title: string,
@@ -23,10 +23,14 @@ const CustomButton: React.FC<CustomButtonProps> = ({
                 ${containerStyles} ${isLoading ? 'opacity-50': ''}`
             }
             disabled={isLoading}
-        >
-            <Text className={`text-primary font-psemibold text-lg ${textStyles}`}>
-                {title}
-            </Text>
+        >  
+            { isLoading ? 
+                <ActivityIndicator size={'small'} color={"#161622"} />
+                :
+                <Text className={`text-primary font-psemibold text-lg ${textStyles}`}>
+                    {title}
+                </Text>
+            }
         </TouchableOpacity>
     )
 }
