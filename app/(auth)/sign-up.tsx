@@ -1,14 +1,14 @@
-import { View, Text, ScrollView, Image, ImageSourcePropType, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, ImageSourcePropType, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '@/constants';
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import CustomButton from '@/components/ui/CustomButton';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { createUser } from "@/lib/appwrite"
 
 export default function SignUp() {
-    const [ user, setUser ] = useState({
+    const [ form, setForm ] = useState({
         username: "",
         email: "",
         password: ""
@@ -17,8 +17,30 @@ export default function SignUp() {
     const [ passwordVisible, setPasswordVisible ] = useState<boolean>(false)
     const [ loading, setLoading ] = useState<boolean>(false)
 
+    const handleOnTextChange = (key: keyof typeof form, value: string) => {
+        setForm(prevForm => ({
+            ...prevForm,
+            [key]: value
+
+        }))
+    }
+
     const handleSubmit = () => {
-        createUser();
+        if(!form.username || !form.email || !form.password) {
+            return Alert.alert('Error', 'Please fill all fields')
+        }
+
+        setLoading(true)
+        try {
+            createUser(form);
+            // router.push('/(auth)/sign-in')
+        } catch (error) {
+            if(error instanceof Error){
+                return Alert.alert('Error', error.message)
+            }
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -43,6 +65,7 @@ export default function SignUp() {
                                 className="flex-1 text-white font-psemibold font-base"
                                 cursorColor="#161622"
                                 placeholder='Your unique username'
+                                onChangeText={(text) => handleOnTextChange('username', text)}
                                 placeholderTextColor="#7B7B8B"
                                 onFocus={()=> setFocused('username')}
                                 onBlur={()=> setFocused(null)}
@@ -62,6 +85,8 @@ export default function SignUp() {
                                 cursorColor="#161622"
                                 placeholder='example@gmail.com'
                                 placeholderTextColor="#7B7B8B"
+                                onChangeText={(text) => handleOnTextChange('email', text)}
+                                textContentType='emailAddress'
                                 onFocus={()=> setFocused('email')}
                                 onBlur={()=> setFocused(null)}
                             />
@@ -80,6 +105,8 @@ export default function SignUp() {
                                 cursorColor="#161622"
                                 placeholder='JSM@stery134X'
                                 placeholderTextColor="#7B7B8B"
+                                onChangeText={(text) => handleOnTextChange('password', text)}
+                                textContentType='password'
                                 secureTextEntry={passwordVisible}
                                 onFocus={()=> setFocused('password')}
                                 onBlur={()=> setFocused(null)}
