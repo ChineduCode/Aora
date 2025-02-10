@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import "../global.css";
+import { GlobalProvider } from "@/context/GlobalProvider";
 
 SplashScreen.preventAutoHideAsync()
 
@@ -31,11 +32,11 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <GlobalProvider>
       <Stack screenOptions={{headerShown: false}}>
         <Stack.Screen name="index" />
       </Stack>
       <StatusBar style="auto"/>
-    </>
+    </GlobalProvider>
   )
 }

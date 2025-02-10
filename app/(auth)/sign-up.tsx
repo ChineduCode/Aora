@@ -25,15 +25,24 @@ export default function SignUp() {
         }))
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if(!form.username || !form.email || !form.password) {
             return Alert.alert('Error', 'Please fill all fields')
+        }
+        const isValidEmail = (email: string) => {
+            return /\S+@\S+\.\S+/.test(email);
+        };
+        
+        if (!isValidEmail(form.email)) {
+            console.error("Invalid email format");
+            return;
         }
 
         setLoading(true)
         try {
-            createUser(form);
-            // router.push('/(auth)/sign-in')
+            const result = await createUser(form);
+            router.replace("/home")
+
         } catch (error) {
             if(error instanceof Error){
                 return Alert.alert('Error', error.message)
@@ -65,6 +74,7 @@ export default function SignUp() {
                                 className="flex-1 text-white font-psemibold font-base"
                                 cursorColor="#161622"
                                 placeholder='Your unique username'
+                                value={form.username}
                                 onChangeText={(text) => handleOnTextChange('username', text)}
                                 placeholderTextColor="#7B7B8B"
                                 onFocus={()=> setFocused('username')}
@@ -85,6 +95,7 @@ export default function SignUp() {
                                 cursorColor="#161622"
                                 placeholder='example@gmail.com'
                                 placeholderTextColor="#7B7B8B"
+                                value={form.email}
                                 onChangeText={(text) => handleOnTextChange('email', text)}
                                 textContentType='emailAddress'
                                 onFocus={()=> setFocused('email')}
@@ -105,6 +116,7 @@ export default function SignUp() {
                                 cursorColor="#161622"
                                 placeholder='JSM@stery134X'
                                 placeholderTextColor="#7B7B8B"
+                                value={form.password}
                                 onChangeText={(text) => handleOnTextChange('password', text)}
                                 textContentType='password'
                                 secureTextEntry={passwordVisible}

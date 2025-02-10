@@ -1,17 +1,56 @@
-import { View, Text, ScrollView, Image, ImageSourcePropType, TextInput } from 'react-native';
+import { View, Text, ScrollView, Image, ImageSourcePropType, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '@/components/ui/CustomButton';
 import { images } from '@/constants';
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { signIn } from '@/lib/appwrite';
 
 export default function SignIn() {
     const [ focused, setFocused ] = useState<string | null>(null)
     const [ passwordVisible, setPasswordVisible ] = useState<boolean>(false)
     const [ loading, setLoading ] = useState<boolean>(false)
+    const [ form, setForm ] = useState({
+        email: "",
+        password: ""
+    })
 
-    const handleSubmit = () => {}
+    const handleOnTextChange = (key: keyof typeof form, value: string) => {
+        setForm(prevForm => ({
+            ...prevForm,
+            [key]: value
+
+        }))
+    }
+    
+    const handleSubmit = async () => {
+        if(!form.email || !form.password) {
+            return Alert.alert('Error', 'Please fill all fields')
+        }
+        const isValidEmail = (email: string) => {
+            return /\S+@\S+\.\S+/.test(email);
+        };
+        
+        if (!isValidEmail(form.email)) {
+            console.error("Invalid email format");
+            return;
+        }
+
+        setLoading(true)
+        try {
+            await signIn(form);
+            router.replace("/home")
+
+        } catch (error) {
+            if(error instanceof Error){
+                return Alert.alert('Error', error.message)
+            }
+            
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <SafeAreaView className="min-h-full bg-primary w-full">
@@ -33,9 +72,12 @@ export default function SignIn() {
                         >
                             <TextInput 
                                 className="flex-1 text-white font-psemibold font-base"
-                                cursorColor="#161622"
+                                cursorColor="#FF8E01"
                                 placeholder='example@gmail.com'
                                 placeholderTextColor="#7B7B8B"
+                                textContentType='emailAddress'
+                                value={form.email}
+                                onChangeText={(text) => handleOnTextChange('email', text)}
                                 onFocus={()=> setFocused('email')}
                                 onBlur={()=> setFocused(null)}
                             />
@@ -51,10 +93,13 @@ export default function SignIn() {
                         >
                             <TextInput 
                                 className="flex-1 text-white font-psemibold font-base"
-                                cursorColor="#161622"
+                                cursorColor="#FF8E01"
                                 placeholder='JSM@stery134X'
                                 placeholderTextColor="#7B7B8B"
+                                textContentType='password'
                                 secureTextEntry={passwordVisible}
+                                value={form.password}
+                                onChangeText={(text) => handleOnTextChange('password', text)}
                                 onFocus={()=> setFocused('password')}
                                 onBlur={()=> setFocused(null)}
                             />
